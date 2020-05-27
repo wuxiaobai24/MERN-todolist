@@ -1,10 +1,14 @@
 import React, { useState } from "react";
-import { Button, TextField } from "@material-ui/core";
+import { Button, TextField, Paper } from "@material-ui/core";
 import SendIcon from "@material-ui/icons/Send";
 const TodoAdd = ({ addTodo }) => {
   const [title, setTitle] = useState("");
+  const sendFunc = () => {
+    addTodo(title);
+    setTitle("");
+  }
   return (
-    <form noValidate autoComplete="off">
+    <Paper elevation={1}>
       <TextField
         id="outlined-basic"
         label="Outlined"
@@ -18,14 +22,12 @@ const TodoAdd = ({ addTodo }) => {
         variant="outlined"
         color="primary"
         endIcon={<SendIcon />}
-        onClick={() => {
-          addTodo(title);
-          setTitle("");
-        }}
+        onClick={sendFunc}
+        fullWidth
       >
         Send
       </Button>
-    </form>
+    </Paper>
   );
 };
 

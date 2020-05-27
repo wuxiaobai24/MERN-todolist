@@ -2,20 +2,7 @@ import React from "react";
 import List from "@material-ui/core/List";
 import TodoItem from "./TodoItem";
 import TodoAdd from "./TodoAdd";
-
-let todoSample = [
-  {
-    id: 1,
-    title: "Test Todo",
-    done: true,
-  },
-  {
-    id: 2,
-    title: "Build a Todo App",
-    done: false,
-  },
-];
-let maxId = 3;
+import axios from "axios";
 
 export default class TodoList extends React.Component {
   constructor() {
@@ -28,27 +15,52 @@ export default class TodoList extends React.Component {
     this.loadData();
   }
   loadData() {
-    this.setState({ todos: todoSample });
+    axios
+      .get("http://localhost:8000/todos")
+      .then(({ data }) => {
+        console.log(data);
+        this.setState({ todos: data.data });
+      })
+      .catch((err) => console.log(err));
   }
 
   checkBoxToggle(id) {
-    const index = todoSample.findIndex((todo) => todo.id === id);
-    todoSample[index].done = !todoSample[index].done;
+    const todo = this.state.todos.findIndex((todo) => todo.id === id);
+    axios
+      .put(`http://localhost:8000/todos/${id}`, { done: !todo.done })
+      .then(() => {
+        this.loadData();
+      })
+      .catch((err) => console.log(err));
     this.loadData();
   }
 
   deleteTodo(id) {
-    todoSample = todoSample.filter((todo) => todo.id !== id);
-    this.loadData();
+    axios
+      .delete(`http://localhost:8000/todos/${id}`)
+      .then(({ data }) => {
+        console.log(data);
+        this.loadData();
+      })
+      .catch((err) => console.log(err));
   }
 
   addTodo(title) {
-    todoSample.push({
-      id: maxId++,
-      title,
-      done: false,
-    });
-    this.loadData();
+    // todoSample.push({
+    //   id: maxId++,
+    //   title,
+    //   done: false,
+    // });
+    axios
+      .post("http://localhost:8000/todos", {
+        title,
+        done: false,
+      })
+      .then((data) => {
+        console.log("post", data);
+        this.loadData();
+      })
+      .catch((err) => console.log(err));
   }
 
   render() {
