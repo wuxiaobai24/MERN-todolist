@@ -1,73 +1,54 @@
 const express = require("express");
 const router = express.Router();
-
-let todoSample = [
-  {
-    id: 1,
-    title: "Test Todo",
-    done: true,
-  },
-  {
-    id: 2,
-    title: "Build a Todo App",
-    done: false,
-  },
-];
-let maxId = 2;
+const Todos = require("../db");
 
 router.get("/", (req, res, next) => {
-  res.send({
-    msg: "ok",
-    data: todoSample,
-  });
+  Todos.find({})
+    .then((todos) => {
+      res.json(todos);
+    })
+    .catch((err) => {
+      res.status(400).json(err);
+    });
 });
 
 router.get("/:id", (req, res, next) => {
-  const id = parseInt(req.param.id, 10);
-  const index = todoSample.findIndex((todo) => todo.id === id);
-  if (index < 0) {
-    res.send({ msg: `Cannot find the todo whose id is ${id}` });
-  } else {
-    res.send({
-      msg: "ok",
-      data: todoSample[index],
+  Todos.findById(req.params.id)
+    .then((todo) => {
+      res.json(todo);
+    })
+    .catch((err) => {
+      res.status(400).json(err);
     });
-  }
 });
 
 router.post("/", (req, res, next) => {
-  const newTodo = {
-    id: ++maxId,
-    ...req.body,
-  };
-  todoSample.push(newTodo);
-  res.send({
-    msg: "ok",
-    data: newTodo,
+  Todos.create(req.body, (err, todo) => {
+    if (err) {
+      res.json(err);
+    } else {
+      res.json(todo);
+    }
   });
 });
 
 router.delete("/:id", (req, res, next) => {
-  const len = todoSample.length;
-  const id = parseInt(req.params.id, 10);
-  console.log(req.params.id);
-  console.log(id);
-  todoSample = todoSample.filter((todo) => todo.id !== id);
-  res.send({
-    msg: len === todoSample.length ? "fail to delete" : "ok",
-  });
+  Todos.findOneAndRemove({
+    _id: req.params.id,
+  })
+    .then((todo) => res.json({ id: req.param.id }))
+    .catch((err) => res.json(err));
 });
 
 router.put("/:id", (req, res, next) => {
-  const id = parseInt(req.params.id, 10);
-  let index = todoSample.findIndex((todo) => todo.id === id);
-  if (index < 0) {
-    res.status(400).send("Fail to find todo");
-  }
-  todoSample[index] = Object.assign(todoSample[index], req.body);
-  res.send({
-    msg: "ok",
-  });
+  console.log(req.body);
+  Todos.findOneAndUpdate(
+    { _id: req.params.id },
+    { $set: req.body },
+    { new: true }
+  )
+    .then((todo) => res.json(todo))
+    .catch((err) => res.json(err));
 });
 
 module.exports = router;

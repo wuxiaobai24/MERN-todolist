@@ -19,13 +19,14 @@ export default class TodoList extends React.Component {
       .get("http://localhost:8000/todos")
       .then(({ data }) => {
         console.log(data);
-        this.setState({ todos: data.data });
+        this.setState({ todos: data });
       })
       .catch((err) => console.log(err));
   }
 
   checkBoxToggle(id) {
-    const todo = this.state.todos.findIndex((todo) => todo.id === id);
+    const todo = this.state.todos.find((todo) => todo._id === id);
+    console.log(todo);
     axios
       .put(`http://localhost:8000/todos/${id}`, { done: !todo.done })
       .then(() => {
@@ -70,10 +71,10 @@ export default class TodoList extends React.Component {
         <List>
           {todos.map((todo, index) => (
             <TodoItem
-              key={todo.id}
+              key={todo._id}
               todo={todo}
-              onCheckBoxToggle={() => this.checkBoxToggle(todo.id)}
-              onDeleteToogle={() => this.deleteTodo(todo.id)}
+              onCheckBoxToggle={() => this.checkBoxToggle(todo._id)}
+              onDeleteToogle={() => this.deleteTodo(todo._id)}
             />
           ))}
         </List>

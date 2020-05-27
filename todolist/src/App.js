@@ -11,6 +11,7 @@ const Copyright = () => (
     <Link color="inherit" href="https://codeand.fun">
       wuxiaobai24
     </Link>
+    {" "}
     {new Date().getFullYear()}
     {"."}
   </Typography>
